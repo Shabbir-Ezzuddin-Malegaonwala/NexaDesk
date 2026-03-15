@@ -11,7 +11,7 @@ import { auth } from "./auth";
 
 const app = new Elysia({ adapter: node() })
     .use(cors({
-        origin: ["http://localhost:3000"],
+        origin: [process.env.FRONTEND_URL ?? "http://localhost:3000"],
         credentials: true,
     }))
     .use(swagger({
@@ -28,6 +28,6 @@ const app = new Elysia({ adapter: node() })
     .use(commentRoutes)
     .use(aiRoutes)
     .get("/health", () => ({ status: "ok", service: "nexadesk-backend" }))
-    .listen(3001);
+    .listen(parseInt(process.env.PORT ?? "3001"));
 
-console.log(`NexaDesk backend running at http://localhost:3001`);
+console.log(`NexaDesk backend running on port ${process.env.PORT ?? 3001}`);

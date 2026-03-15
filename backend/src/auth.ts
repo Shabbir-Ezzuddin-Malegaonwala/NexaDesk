@@ -25,5 +25,5 @@ export const auth = betterAuth({
             allowUserToCreateOrganization: true,
         }),
     ],
-    trustedOrigins: ["http://localhost:3000"],
+    trustedOrigins: [process.env.FRONTEND_URL ?? "http://localhost:3000"],
 });

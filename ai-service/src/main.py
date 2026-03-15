@@ -12,7 +12,10 @@ app = FastAPI(title="NexaDesk AI Service", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=[
+    os.getenv("FRONTEND_URL", "http://localhost:3000"),
+    os.getenv("BACKEND_URL", "http://localhost:3001"),
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
