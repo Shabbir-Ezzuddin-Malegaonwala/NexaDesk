@@ -9,9 +9,11 @@ import { commentRoutes } from "./routes/comments";
 import { aiRoutes } from "./routes/ai";
 import { auth } from "./auth";
 
+const frontendUrl = (process.env.FRONTEND_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
 const app = new Elysia({ adapter: node() })
     .use(cors({
-        origin: [process.env.FRONTEND_URL ?? "http://localhost:3000"],
+        origin: [frontendUrl],
         credentials: true,
     }))
     .use(swagger({

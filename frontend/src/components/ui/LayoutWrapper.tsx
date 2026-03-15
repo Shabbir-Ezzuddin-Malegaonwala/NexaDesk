@@ -10,7 +10,7 @@ const COLLAPSED = 64;
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
     const pathname = usePathname();
-    const hideSidebar = pathname === "/login" || pathname === "/signup";
+    const hideSidebar = pathname === "/login" || pathname === "/signup" || pathname === "/setup-org";
 
     if (hideSidebar) return <>{children}</>;
 

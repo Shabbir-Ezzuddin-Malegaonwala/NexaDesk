@@ -48,20 +48,53 @@ export default function SignUpPage() {
         setError(null);
         setIsLoading(true);
         try {
+            // Step 1: Create user account
             setStep("account");
             const res = await signUp.email({ name: form.name, email: form.email, password: form.password });
-            if (res.error) { setError(res.error.message ?? "Signup failed"); setIsLoading(false); setStep("idle"); return; }
+            if (res.error) {
+                const msg = res.error.message ?? "Signup failed";
+                setError(msg.includes("already") ? "User already exists. Use another email." : msg);
+                setIsLoading(false);
+                setStep("idle");
+                return;
+            }
 
+            // Step 2: Create organization (with retry)
             setStep("org");
-            const orgRes = await authClient.organization.create({
-                name: form.orgName,
-                slug: form.orgName.toLowerCase().replace(/\s+/g, "-"),
-            });
-            if (orgRes.error) { setError("Account created but organization setup failed."); setIsLoading(false); setStep("idle"); return; }
+            const slug = form.orgName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+            let orgCreated = false;
+            let lastOrgError = "";
 
-            setStep("activating");
-            await authClient.organization.setActive({ organizationId: orgRes.data.id });
-            router.push("/");
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const orgRes = await authClient.organization.create({
+                        name: form.orgName,
+                        slug: slug,
+                    });
+                    if (orgRes.error) {
+                        lastOrgError = orgRes.error.message ?? "Organization creation failed";
+                        await new Promise(r => setTimeout(r, 1000)); // wait before retry
+                        continue;
+                    }
+
+                    // Step 3: Activate the organization
+                    setStep("activating");
+                    await authClient.organization.setActive({ organizationId: orgRes.data.id });
+                    orgCreated = true;
+                    break;
+                } catch {
+                    lastOrgError = "Organization creation failed";
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+
+            if (orgCreated) {
+                router.push("/");
+            } else {
+                // Account exists but org failed — redirect to setup-org page
+                console.warn("Org creation failed after retries:", lastOrgError);
+                router.push("/setup-org");
+            }
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Something went wrong");
             setIsLoading(false);
