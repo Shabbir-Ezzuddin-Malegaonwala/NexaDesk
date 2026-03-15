@@ -5,6 +5,7 @@ from src.models import ClassifyRequest, ClassifyResponse, SuggestRequest
 from src.classifier import classify_ticket
 from src.suggester import stream_suggestion
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
