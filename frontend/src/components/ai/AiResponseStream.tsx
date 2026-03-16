@@ -8,7 +8,8 @@ interface AiResponseStreamProps { ticketId: string; }
 export default function AiResponseStream({ ticketId }: AiResponseStreamProps) {
     const { data, isStreaming, error, startStream, stopStream } = useSSEStream();
     const [copied, setCopied] = useState(false);
-    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const rawUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const API_URL = rawUrl.replace(/\/$/, "");
 
     const handleSuggest = () => startStream(`${API_URL}/tickets/${ticketId}/suggest-response`);
 
