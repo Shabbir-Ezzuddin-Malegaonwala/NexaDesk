@@ -9,7 +9,8 @@ export async function classifyTicket(
     title: string,
     description: string
 ): Promise<ClassifyResponse> {
-    const aiServiceUrl = process.env.AI_SERVICE_URL ?? "http://localhost:8000";
+    const rawUrl = process.env.AI_SERVICE_URL ?? "http://localhost:8000";
+    const aiServiceUrl = rawUrl.replace(/\/$/, "");
 
     try {
         const response = await fetch(`${aiServiceUrl}/classify`, {
@@ -33,7 +34,8 @@ export async function streamSuggestResponse(
     ticketData: object,
     onChunk: (chunk: string) => void
 ): Promise<void> {
-    const aiServiceUrl = process.env.AI_SERVICE_URL ?? "http://localhost:8000";
+    const rawUrl = process.env.AI_SERVICE_URL ?? "http://localhost:8000";
+    const aiServiceUrl = rawUrl.replace(/\/$/, "");
 
     try {
         const response = await fetch(`${aiServiceUrl}/suggest-response`, {
